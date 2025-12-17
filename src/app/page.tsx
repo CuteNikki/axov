@@ -19,7 +19,7 @@ export default async function Page() {
           </li>
         ))}
       </ol>
-      <ComponentExample />;
+      <ComponentExample />
     </>
   );
 }
