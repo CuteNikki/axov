@@ -9,59 +9,67 @@ import { TodoCreateInput } from '@/generated/models';
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-const todoData: TodoCreateInput[] = [
+const todoData: (TodoCreateInput & { id: number })[] = [
   {
+    id: 1,
     title: 'Pay electricity bill',
     priority: 1,
     dueAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
     orderIndex: 1,
   },
   {
+    id: 2,
     title: 'Finish todo app schema',
     priority: 2,
     dueAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3),
     orderIndex: 2,
   },
   {
+    id: 3,
     title: 'Reply to emails',
     priority: 3,
     orderIndex: 3,
   },
   {
+    id: 4,
     title: 'Buy groceries',
     priority: 3,
     dueAt: new Date(),
     orderIndex: 4,
   },
   {
+    id: 5,
     title: 'Book dentist appointment',
     priority: 2,
     orderIndex: 5,
   },
   {
+    id: 6,
     title: 'Clean desk',
     orderIndex: 6,
   },
   {
+    id: 7,
     title: 'Submit tax documents',
     priority: 1,
     dueAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
     orderIndex: 7,
   },
   {
+    id: 8,
     title: 'Read Prisma docs',
     priority: 4,
     completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
     orderIndex: 8,
   },
 ];
-
 export async function main() {
-  // Seed todos
   for (const t of todoData) {
-    const existing = await prisma.todo.findFirst({ where: { title: t.title } });
-    if (existing) continue;
-    await prisma.todo.create({ data: t });
+    await prisma.todo.upsert({
+      where: { id: t.id },
+      update: t,
+      create: t,
+    });
   }
 }
 
