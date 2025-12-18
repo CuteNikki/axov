@@ -1,6 +1,29 @@
+// Actions
+import { getTodos } from '@/actions/todos';
 // Components
 import { ComponentExample } from '@/components/component-example';
+import { TodoUpdateForm } from '@/components/todo/update-form';
 
 export default async function Page() {
-  return <ComponentExample />;
+  const todos = await getTodos();
+
+  return (
+    <>
+      {todos.map((todo) => (
+        <TodoUpdateForm
+          key={todo.id}
+          title={todo.title}
+          description={todo.description}
+          orderIndex={todo.orderIndex}
+          priority={todo.priority}
+          dueAt={todo.dueAt}
+          completedAt={todo.completedAt}
+          id={todo.id}
+          createdAt={todo.createdAt}
+          updatedAt={todo.updatedAt}
+        />
+      ))}
+      <ComponentExample />
+    </>
+  );
 }
