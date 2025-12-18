@@ -9,10 +9,10 @@ export const createTodoSchema = z.object({
 export const updateTodoSchema = z.object({
   title: z.string().trim().min(1, 'Title is required').max(200, 'Title is too long'),
   description: z.string().trim().max(2055, 'Description is too long').nullable(),
-  orderIndex: z.number().int().nonnegative().nullable(),
-  priority: z.number().int().min(1).max(5).nullable(),
-  dueAt: z.date().nullable(),
-  completedAt: z.date().nullable(),
+  orderIndex: z.number().int().nonnegative('Order index must be non-negative').nullable(),
+  priority: z.number().int().min(0, 'Priority must be at least 0').max(3, 'Priority must be at most 3').nullable(),
+  dueAt: z.date('Invalid date').nullable(),
+  completedAt: z.date('Invalid date').nullable(),
 });
 
 export type CreateTodoInput = z.infer<typeof createTodoSchema>;

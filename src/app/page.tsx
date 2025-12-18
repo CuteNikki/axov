@@ -9,20 +9,22 @@ export default async function Page() {
 
   return (
     <>
-      {todos.map((todo) => (
-        <TodoUpdateForm
-          key={todo.id}
-          title={todo.title}
-          description={todo.description}
-          orderIndex={todo.orderIndex}
-          priority={todo.priority}
-          dueAt={todo.dueAt}
-          completedAt={todo.completedAt}
-          id={todo.id}
-          createdAt={todo.createdAt}
-          updatedAt={todo.updatedAt}
-        />
-      ))}
+      <div className='flex flex-wrap justify-center gap-4 p-4'>
+        {todos.map((todo) => (
+          <TodoUpdateForm
+            key={todo.id}
+            title={todo.title}
+            description={todo.description}
+            orderIndex={todo.orderIndex}
+            priority={todo.priority}
+            dueAt={todo.dueAt}
+            completedAt={todo.completedAt}
+            id={todo.id}
+            createdAt={todo.createdAt}
+            updatedAt={todo.updatedAt}
+          />
+        ))}
+      </div>
       <ComponentExample />
     </>
   );

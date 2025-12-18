@@ -58,7 +58,7 @@ const todoData: (TodoCreateInput & { id: number })[] = [
   {
     id: 8,
     title: 'Read Prisma docs',
-    priority: 4,
+    priority: 3,
     completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
     orderIndex: 8,
   },
