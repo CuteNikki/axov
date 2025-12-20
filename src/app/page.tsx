@@ -8,7 +8,7 @@ export default async function Page() {
   const todos = await getTodos();
 
   return (
-    <>
+    <main>
       <div className='flex flex-wrap justify-center gap-4 p-4'>
         {todos.map((todo) => (
           <TodoUpdateForm
@@ -26,6 +26,6 @@ export default async function Page() {
         ))}
       </div>
       <ComponentExample />
-    </>
+    </main>
   );
 }
