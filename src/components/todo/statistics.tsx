@@ -11,7 +11,8 @@ export function TodoStatistics({ todos }: { todos: Todo[] }) {
     total: todos.length,
     completed: todos.filter((t) => getTodoStatus(t).completed).length,
     pending: todos.filter((t) => !getTodoStatus(t).completed).length,
-    overdue: todos.filter((t) => getTodoStatus(t).overdue).length,
+    // dueAt in the past and not completed, in this case we dont want todos that were completed after dueAt to count as overdue
+    overdue: todos.filter((t) => t.dueAt && new Date(t.dueAt) < new Date() && !t.completedAt).length,
   };
 
   const items = [

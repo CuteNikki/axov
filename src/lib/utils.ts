@@ -27,6 +27,7 @@ export function formatDatetimeLocal(date?: Date | string) {
 export function getTodoStatus(todo: Todo) {
   return {
     completed: todo.completedAt !== null,
+    // dueAt in the past and not completed and completed after dueAt
     overdue: todo.dueAt !== null && new Date(todo.dueAt) < new Date() && (!todo.completedAt || new Date(todo.completedAt) > new Date(todo.dueAt)),
   };
 }
