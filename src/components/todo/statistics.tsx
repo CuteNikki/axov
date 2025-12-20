@@ -2,17 +2,16 @@
 import { AlertCircleIcon, CheckCircle2Icon, Clock2Icon, ListTodoIcon } from 'lucide-react';
 // Types
 import { Todo } from '@/generated/client';
-// Utils
-import { getTodoStatus } from '@/lib/utils';
 // Components
 import { Card, CardContent } from '@/components/ui/card';
+import { getTodoStatus } from '@/lib/utils';
 
 export function TodoStatistics({ todos }: { todos: Todo[] }) {
   const stats = {
     total: todos.length,
-    completed: todos.filter((t) => getTodoStatus(t) === 'completed').length,
-    pending: todos.filter((t) => getTodoStatus(t) === 'pending').length,
-    overdue: todos.filter((t) => getTodoStatus(t) === 'overdue').length,
+    completed: todos.filter((t) => getTodoStatus(t).completed).length,
+    pending: todos.filter((t) => !getTodoStatus(t).completed).length,
+    overdue: todos.filter((t) => getTodoStatus(t).overdue).length,
   };
 
   const items = [

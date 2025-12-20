@@ -28,9 +28,7 @@ interface TodoItemProps {
 }
 
 export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, isDragging, dragHandleProps }: TodoItemProps) {
-  const status = getTodoStatus(todo);
-  const isCompleted = status === 'completed';
-  const isOverdue = status === 'overdue';
+  const { completed: isCompleted, overdue: isOverdue } = getTodoStatus(todo);
 
   const [editTitle, setEditTitle] = useState(todo.title);
   const [editDescription, setEditDescription] = useState(todo.description || '');
@@ -86,31 +84,32 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, i
       <CardContent className='flex flex-row items-center justify-between gap-2'>
         <div className='flex flex-1 flex-row items-center gap-4'>
           <Checkbox
-            name={`todo-complete-${todo.id}`}
+            aria-label={`todo-complete-${todo.id}`}
             checked={isCompleted}
             onCheckedChange={() => onToggleComplete(todo.id)}
-            className='size-5 shrink-0 rounded-full border-2'
+            className='size-6 shrink-0 rounded-full border-2'
           />
           <div className='flex flex-1 flex-col'>
             <div className='flex-1'>
               <div className='relative'>
                 <input
+                  aria-label={`todo-title-${todo.id}`}
                   ref={titleInputRef}
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   onBlur={handleTitleSave}
                   onKeyDown={handleTitleKeyDown}
                   className={cn(
-                    'block w-full truncate bg-transparent leading-tight font-medium outline-none',
+                    'hover:bg-accent block w-full truncate rounded-sm bg-transparent p-1 text-base leading-tight font-medium outline-none',
                     isCompleted && 'text-muted-foreground line-through',
                   )}
                 />
               </div>
 
               {todo.description && (
-                <div className='pt-1'>
+                <div className='pt-1 pb-1'>
                   <textarea
-                    name='todo-description'
+                    aria-label={`todo-description-${todo.id}`}
                     ref={descriptionInputRef}
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
@@ -118,20 +117,21 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, i
                     onKeyDown={handleDescriptionKeyDown}
                     rows={Math.max(1, (editDescription || '').split('\n').length)}
                     className={cn(
-                      'text-muted-foreground caret-primary block w-full resize-none truncate bg-transparent text-sm leading-normal outline-none',
+                      'text-muted-foreground caret-primary hover:bg-accent block w-full resize-none truncate rounded-sm bg-transparent p-1 text-sm leading-tight outline-none',
                       !editDescription && 'italic opacity-50',
                     )}
                   />
                 </div>
               )}
             </div>
-            <div className='flex flex-wrap items-center gap-2 pt-3'>
+
+            <div className='flex flex-wrap items-center gap-4 pt-3'>
               <Select value={todo.priority?.toString() ?? 'none'} onValueChange={handlePriorityChange}>
                 <SelectTrigger
-                  name={`todo-priority-${todo.id}`}
-                  className='h-auto w-auto gap-1 border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:hidden'
+                  aria-label={`todo-priority-${todo.id}`}
+                  className={cn('[&>svg]:text-foreground! h-auto w-auto gap-1 px-2 py-0 [&>svg]:opacity-100!', getPriorityColor(todo.priority))}
                 >
-                  <Badge variant='outline' className={cn('cursor-pointer hover:opacity-80', getPriorityColor(todo.priority))}>
+                  <Badge variant='outline' className='border-none p-0'>
                     {getPriorityLabel(todo.priority)}
                   </Badge>
                 </SelectTrigger>
@@ -171,23 +171,31 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, i
 
               <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
                 <PopoverTrigger asChild>
-                  <button
-                    className={cn(
-                      'group/due-date inline-flex cursor-pointer items-center gap-1 text-xs transition-opacity hover:opacity-80',
-                      isOverdue && 'text-destructive',
-                      !isOverdue && todo.dueAt && 'text-muted-foreground',
-                      !todo.dueAt && 'text-muted-foreground opacity-60',
-                    )}
-                  >
-                    {isOverdue ? <Clock className='h-3 w-3' /> : <Calendar className='h-3 w-3' />}
-                    <span>{todo.dueAt ? formatRelativeDate(todo.dueAt) : 'Set due date'}</span>
-                    {todo.dueAt && (
-                      <X
-                        className='hover:text-destructive ml-0.5 h-3 w-3 opacity-0 transition-opacity group-hover/due-date:opacity-60 hover:opacity-100!'
-                        onClick={clearDueDate}
-                      />
-                    )}
-                  </button>
+                  {(todo.dueAt || !isCompleted) && (
+                    <button
+                      className={cn(
+                        'group/due-date inline-flex cursor-pointer items-center gap-1 text-xs transition-opacity hover:opacity-80',
+                        isOverdue && 'text-destructive',
+                        !isOverdue && todo.dueAt && 'text-muted-foreground',
+                        !todo.dueAt && 'text-muted-foreground opacity-60',
+                      )}
+                    >
+                      {isOverdue ? <Clock className='h-3 w-3' /> : <Calendar className='h-3 w-3' />}
+                      <span>
+                        {todo.dueAt
+                          ? isOverdue && isCompleted
+                            ? `was due ${format(todo.dueAt, 'MMM d HH:mm')}`
+                            : formatRelativeDate(todo.dueAt)
+                          : 'Set due date'}
+                      </span>
+                      {todo.dueAt && (
+                        <X
+                          className='hover:text-destructive ml-0.5 h-3 w-3 opacity-0 transition-opacity group-hover/due-date:opacity-60 hover:opacity-100!'
+                          onClick={clearDueDate}
+                        />
+                      )}
+                    </button>
+                  )}
                 </PopoverTrigger>
                 <PopoverContent className='w-auto p-0' align='start'>
                   <span>@todo: add calendar here</span>
@@ -197,17 +205,17 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, i
               {isCompleted && (
                 <div className='text-status-completed flex items-center gap-1 text-xs'>
                   <Check className='h-3 w-3' />
-                  <span>Completed {todo.completedAt && format(todo.completedAt, 'MMM d')}</span>
+                  <span>Completed {todo.completedAt && format(todo.completedAt, 'MMM d HH:mm')}</span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className='flex flex-row items-center gap-2'>
+        <div className='flex flex-col-reverse items-center gap-2 sm:flex-row'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon' className='h-8 w-8 shrink-0 transition-opacity group-hover:opacity-100 sm:opacity-0'>
+              <Button variant='ghost' size='icon' className='h-8 w-8 shrink-0 transition-opacity group-hover:opacity-100 lg:opacity-0'>
                 <MoreHorizontal />
                 <span className='sr-only'>Actions</span>
               </Button>
@@ -224,11 +232,8 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, i
             </DropdownMenuContent>
           </DropdownMenu>
           {/* Draggable area */}
-          <div
-            {...dragHandleProps}
-            className='text-muted-foreground cursor-grab touch-none transition-opacity group-hover:opacity-100 active:cursor-grabbing sm:opacity-0'
-          >
-            <GripVertical className='size-4 shrink-0' />
+          <div {...dragHandleProps} className='text-muted-foreground cursor-grab touch-none'>
+            <GripVertical className='size-6 shrink-0' />
           </div>
         </div>
       </CardContent>
