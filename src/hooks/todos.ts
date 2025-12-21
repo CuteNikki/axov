@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { getTodos } from '@/actions/todos';
 // Types
 import { Todo } from '@/generated/client';
-import { TodoFilters } from '@/lib/types';
+import { TodoFilters } from '@/lib/todos';
 
 export function useTodos() {
   const [loading, setLoading] = useState(true);

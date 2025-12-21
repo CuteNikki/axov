@@ -4,56 +4,23 @@
 import { revalidatePath } from 'next/cache';
 // Database
 import prisma from '@/lib/prisma';
-// Types
-import { TodoFilters, TodoPriorityValue } from '@/lib/types';
 // Utils
-import { CreateTodoInput, createTodoSchema, UpdateTodoInput } from '@/lib/validation/todos';
+import { CreateTodoInput, createTodoSchema, filterTodoSchema, TodoFilters, UpdateTodoInput } from '@/lib/todos';
 
 /**
- * Get statistics about todos
- * @returns An object containing total, completed, pending, and overdue todo counts
+ * Fetch todos with optional filters
+ * @param filters Optional filters to apply
+ * @returns List of todos
  */
-export async function getTodoStats() {
-  // Raw SQL implementation for performance:
-  // const [row] = await prisma.$queryRaw<
-  //   Array<{
-  //     total: number;
-  //     completed: number;
-  //     pending: number;
-  //     overdue: number;
-  //   }>
-  // >`
-  //   SELECT
-  //     COUNT(*) AS total,
-  //     COUNT("completedAt") AS completed,
-  //     SUM(CASE WHEN "completedAt" IS NULL THEN 1 ELSE 0 END) AS pending,
-  //     SUM(CASE
-  //       WHEN "completedAt" IS NULL AND "dueAt" < NOW()
-  //       THEN 1 ELSE 0 END
-  //     ) AS overdue
-  //   FROM "Todo"
-  // `;
-
-  // return row;
-
-  // Original implementation without raw SQL:
-  const [total, completed, pending, overdue] = await Promise.all([
-    prisma.todo.count(),
-    prisma.todo.count({ where: { completedAt: { not: null } } }),
-    prisma.todo.count({ where: { completedAt: null } }),
-    prisma.todo.count({
-      where: {
-        completedAt: null,
-        dueAt: { lt: new Date() },
-      },
-    }),
-  ]);
-
-  return { total, completed, pending, overdue };
-}
-
 export async function getTodos(filters?: TodoFilters) {
-  const { search, statuses, priorities, sortField, sortDirection } = filters || {};
+  const parsed = filterTodoSchema.safeParse(filters);
+
+  if (!parsed.success) {
+    console.error('Invalid todo filters:', parsed.error);
+    return [];
+  }
+
+  const { search, statuses, priorities, sortField, sortDirection } = parsed.data;
 
   return prisma.todo.findMany({
     where: {
@@ -92,7 +59,8 @@ export async function getTodos(filters?: TodoFilters) {
       ...(priorities?.length
         ? {
             priority: {
-              in: priorities.filter((p): p is Exclude<TodoPriorityValue, null> => p !== null),
+              // Filter out nulls for the query
+              in: priorities.filter((p) => p !== null),
             },
           }
         : {}),
@@ -100,29 +68,31 @@ export async function getTodos(filters?: TodoFilters) {
 
     // Sorting
     orderBy: {
+      // Sort by orderIndex by default else use provided sortField
       [sortField || 'orderIndex']: sortDirection,
     },
   });
 }
 
+/**
+ * Create a new todo
+ * @param values Values for the new todo
+ * @returns Result of the creation
+ */
 export async function createTodo(values: CreateTodoInput) {
   const parsed = createTodoSchema.safeParse(values);
 
+  // Validation failed, provided values are invalid
   if (!parsed.success) {
     return { success: false, errors: parsed.error.flatten().fieldErrors };
   }
 
   await prisma.todo.create({
-    data: {
-      title: parsed.data.title,
-      description: parsed.data.description,
-    },
+    data: parsed.data,
   });
   revalidatePath('/');
   return { success: true };
 }
-
-export type UpdateTodoResult = { success: true } | { success: false; errors: Record<string, string[]> };
 
 export async function updateTodo(id: number, values: UpdateTodoInput) {
   // const parsed = updateTodoSchema.safeParse(values);

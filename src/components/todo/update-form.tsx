@@ -6,9 +6,11 @@ import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 // Actions
 import { updateTodo } from '@/actions/todos';
-// Utils & Validation
+// Utils
 import { formatDatetimeLocal } from '@/lib/utils';
-import { updateTodoSchema, type UpdateTodoInput } from '@/lib/validation/todos';
+// Types
+import { Todo } from '@/generated/client';
+import { updateTodoSchema, type UpdateTodoInput } from '@/lib/todos';
 // Components
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,19 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-interface TodoUpdateFormProps {
-  title: string;
-  description: string | null;
-  orderIndex: number | null;
-  priority: number | null;
-  dueAt: Date | null;
-  completedAt: Date | null;
-  id: number;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
-
-export function TodoUpdateForm({ title, description, orderIndex, priority, dueAt, completedAt, id }: TodoUpdateFormProps) {
+export function TodoUpdateForm({ title, description, orderIndex, priority, dueAt, completedAt, id }: Todo) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<UpdateTodoInput>({

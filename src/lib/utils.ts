@@ -15,7 +15,7 @@ export const PRIORITIES = [
   { value: 1, label: 'High', backgroundColor: 'bg-orange-700!' },
   { value: 2, label: 'Medium', backgroundColor: 'bg-yellow-700!' },
   { value: 3, label: 'Low', backgroundColor: 'bg-green-700!' },
-];
+] as const;
 
 export function formatDatetimeLocal(date?: Date | string) {
   if (!date) return '';
