@@ -131,7 +131,7 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, i
               )}
             </div>
 
-            <div className='flex flex-wrap items-center gap-4 pt-3'>
+            <div className='flex flex-wrap items-center gap-2 pt-3'>
               <Select value={todo.priority?.toString() ?? 'none'} onValueChange={handlePriorityChange}>
                 <SelectTrigger
                   aria-label={`todo-priority-${todo.id}`}
@@ -211,10 +211,10 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onEdit, onDelete, i
               </Popover>
 
               {isCompleted && (
-                <div className='text-status-completed flex items-center gap-1 text-xs'>
+                <Button disabled variant='ghost' size='sm'>
                   <Check className='h-3 w-3' />
-                  <span>Completed {todo.completedAt && format(todo.completedAt, 'MMM d HH:mm')}</span>
-                </div>
+                  Completed {todo.completedAt && format(todo.completedAt, 'MMM d HH:mm')}
+                </Button>
               )}
             </div>
           </div>
