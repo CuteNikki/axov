@@ -1,8 +1,8 @@
 # Axov
 
-**Axov** is an open-source, next-generation productivity suite designed to help you manage your tasks, projects, and schedule—all in one place.
+**Axov** is an open-source, next-generation productivity suite designed to help you manage your tasks, projects, and schedule! All in one place.
 
-## ✨ Key Features
+### ✨ Key Features
 
 - **To-do Management:** Create, organize, and prioritize your tasks efficiently.
 - **Kanban Boards:** Visualize your workflow and track progress with drag-and-drop boards.
@@ -12,7 +12,7 @@
 
 ---
 
-## 🚀 Tech Stack
+### 🚀 Tech Stack
 
 - [Next.js 16](https://nextjs.org/)
 - [shadcn/ui](https://ui.shadcn.com/)
@@ -20,7 +20,7 @@
 
 ---
 
-## 📸 Preview
+### 📸 Preview
 
 Random Progress Screenshot for Todos:
 
@@ -28,7 +28,7 @@ Random Progress Screenshot for Todos:
 
 ---
 
-## 🛠️ Getting Started
+### 🛠️ Getting Started
 
 Follow these steps to set up Axov locally:
 
@@ -66,14 +66,14 @@ bun run dev
 
 ---
 
-## 🤝 Contributing
+### 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!  
 Feel free to check the [issues page](https://github.com/yourusername/axov/issues) or submit a pull request.
 
 ---
 
-## 📄 License
+### 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
 
