@@ -155,7 +155,7 @@ export function TodoUpdateForm({ title, description, orderIndex, priority, dueAt
           {/* Submit */}
           <CardFooter className='justify-end'>
             <CardAction>
-              <Button type='submit' disabled={isPending || !form.formState.isDirty}>
+              <Button type='submit' disabled={isPending || !form.formState.isDirty || !form.formState.isValid}>
                 {isPending ? 'Saving...' : 'Save'}
               </Button>
             </CardAction>
